@@ -1,0 +1,19 @@
+# GitHub disables scheduled workflows in a public repo after 60 days without
+# commits. A monthly empty commit keeps `watch` alive. If it ever stops anyway,
+# healthchecks.io alarms because the pings stop.
+name: keepalive
+on:
+  schedule:
+    - cron: "17 4 1 * *"
+  workflow_dispatch:
+permissions: { contents: write }
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          git config user.name "salus-watch keepalive"
+          git config user.email "actions@users.noreply.github.com"
+          git commit --allow-empty -m "keepalive $(date -u +%F)"
+          git push
